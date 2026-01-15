@@ -1,0 +1,2989 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGMATOR - لوحة التحكم الإدارية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #0f172a;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius: 16px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        input, button, textarea, select {
+            font-family: inherit;
+        }
+
+        /* Editable Text Styles */
+        .editable-text {
+            position: relative;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .editable-text:hover {
+            background: rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+
+        .edit-icon {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            font-size: 14px;
+            background: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+            box-shadow: var(--shadow);
+        }
+
+        .editable-text:hover .edit-icon {
+            opacity: 1;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 24px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Login Page */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            width: 100%;
+            max-width: 460px;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .login-logo {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 32px;
+            font-size: 36px;
+        }
+
+        .login-title {
+            font-size: 32px;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--gray-700);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--gray-900);
+        }
+
+        .header-user {
+            font-size: 14px;
+            color: var(--gray-500);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-header {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            background: var(--danger);
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-header:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            flex: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 32px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--gray-900);
+        }
+
+        /* Quick Access Cards */
+        .quick-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .quick-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-top: 4px solid;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .quick-card.primary {
+            border-top-color: var(--primary);
+        }
+
+        .quick-card.success {
+            border-top-color: var(--success);
+        }
+
+        .quick-card.warning {
+            border-top-color: var(--warning);
+        }
+
+        .quick-card.secondary {
+            border-top-color: var(--secondary);
+        }
+
+        .quick-card-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .quick-card-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--gray-900);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+            border-top: 4px solid;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card.success {
+            border-top-color: var(--success);
+        }
+
+        .stat-card.warning {
+            border-top-color: var(--warning);
+        }
+
+        .stat-card.primary {
+            border-top-color: var(--primary);
+        }
+
+        .stat-card.danger {
+            border-top-color: var(--danger);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray-500);
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-value {
+            font-size: 40px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .stat-value.success {
+            color: var(--success);
+        }
+
+        .stat-value.warning {
+            color: var(--warning);
+        }
+
+        .stat-value.primary {
+            color: var(--primary);
+        }
+
+        .stat-value.danger {
+            color: var(--danger);
+        }
+
+        .stat-detail {
+            font-size: 13px;
+            color: var(--gray-400);
+        }
+
+        /* Card */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .table th {
+            padding: 18px 16px;
+            text-align: right;
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .table tbody tr {
+            transition: background 0.2s;
+        }
+
+        .table tbody tr:hover {
+            background: var(--gray-50);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge.danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Buttons */
+        .btn-sm {
+            padding: 10px 18px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-edit {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 24px;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.2s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--gray-900);
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            font-size: 20px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-200);
+            transform: rotate(90deg);
+        }
+
+        .form-row {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-row.cols-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 2px solid var(--gray-100);
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: 2px solid var(--gray-200);
+            background: white;
+            color: var(--gray-600);
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--gray-300);
+            background: var(--gray-50);
+        }
+
+        .filter-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 15px;
+            background: white url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 14px center;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 24px;
+            color: var(--gray-400);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--gray-600);
+        }
+
+        .empty-text {
+            font-size: 14px;
+            color: var(--gray-400);
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            background: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 400px;
+            animation: slideInLeft 0.3s;
+            z-index: 2000;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .toast-icon {
+            font-size: 24px;
+        }
+
+        .toast-message {
+            flex: 1;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 16px;
+            }
+
+            .header {
+                padding: 16px 20px;
+            }
+
+            .login-box {
+                padding: 32px 24px;
+            }
+
+            .modal {
+                padding: 24px;
+            }
+
+            .form-row.cols-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .stat-value {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="loading-screen">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <div style="font-size: 18px; font-weight: 700;">جاري التحميل...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        setTimeout(initApp, 1000);
+
+        function initApp() {
+            if (typeof firebase === 'undefined') {
+                showToast('فشل تحميل Firebase', 'error');
+                return;
+            }
+
+            const config = {
+                apiKey: "AIzaSyA3jj5vLbx8eoLNy7YAltlGDt4a6LwqukQ",
+                authDomain: "login-system-848da.firebaseapp.com",
+                databaseURL: "https://login-system-848da-default-rtdb.asia-southeast1.firebasedatabase.app",
+                projectId: "login-system-848da",
+                storageBucket: "login-system-848da.firebasestorage.app",
+                messagingSenderId: "357774575981",
+                appId: "1:357774575981:web:63ae6c73e99cf86becb264"
+            };
+
+            firebase.initializeApp(config);
+            const db = firebase.database();
+
+            let state = {
+                isAuth: false,
+                currentAdmin: '',
+                admins: {},
+                users: {},
+                settings: {},
+                appVersion: {},
+                revenueSettings: {},
+                cmsContent: {},
+                customPages: {},
+                editMode: false,
+                view: 'dashboard',
+                selectedUser: null,
+                filter: 'all',
+                search: '',
+                loading: false,
+                lastActivity: Date.now()
+            };
+
+            // Session timeout checker (10 minutes = 600000 ms)
+            const SESSION_TIMEOUT = 600000; // 10 minutes
+            
+            function checkSession() {
+                if (state.isAuth) {
+                    const now = Date.now();
+                    if (now - state.lastActivity > SESSION_TIMEOUT) {
+                        showToast('انتهت الجلسة بسبب عدم النشاط', 'error');
+                        state.isAuth = false;
+                        state.currentAdmin = '';
+                        render();
+                    }
+                }
+            }
+
+            function updateActivity() {
+                state.lastActivity = Date.now();
+            }
+
+            // Check session every minute
+            setInterval(checkSession, 60000);
+            
+            // Update activity on any interaction
+            document.addEventListener('click', updateActivity);
+            document.addEventListener('keypress', updateActivity);
+            document.addEventListener('scroll', updateActivity);
+
+            // Utility: Show toast notification
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <div class="toast-icon">${type === 'success' ? '✅' : '❌'}</div>
+                    <div class="toast-message">${message}</div>
+                `;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
+
+            // Utility: Show confirm modal
+            function showConfirm(title, message, onConfirm) {
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal" style="max-width: 450px;">
+                        <div class="modal-header">
+                            <h2 class="modal-title">⚠️ ${title}</h2>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+                        </div>
+                        <p style="font-size: 16px; color: var(--gray-700); line-height: 1.8; margin-bottom: 24px;">${message}</p>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-danger" style="flex: 1;" onclick="this.closest('.modal-overlay').confirmAction()">
+                                <span>✓</span>
+                                <span>تأكيد</span>
+                            </button>
+                            <button class="btn" style="flex: 1; background: var(--gray-200); color: var(--gray-700);" onclick="this.closest('.modal-overlay').remove()">
+                                <span>✕</span>
+                                <span>إلغاء</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                modal.confirmAction = () => {
+                    onConfirm();
+                    modal.remove();
+                };
+                modal.onclick = (e) => {
+                    if (e.target === modal) modal.remove();
+                };
+                document.body.appendChild(modal);
+            }
+
+            // Utility: Show prompt modal
+            function showPrompt(title, label, defaultValue, onSubmit) {
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h2 class="modal-title">${title}</h2>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+                        </div>
+                        <form id="promptForm">
+                            <div class="form-group">
+                                <label class="form-label">${label}</label>
+                                <input type="text" class="form-input" name="value" value="${defaultValue || ''}" required autofocus>
+                            </div>
+                            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                                    <span>✓</span>
+                                    <span>حفظ</span>
+                                </button>
+                                <button type="button" class="btn" style="flex: 1; background: var(--gray-200); color: var(--gray-700);" onclick="this.closest('.modal-overlay').remove()">
+                                    <span>✕</span>
+                                    <span>إلغاء</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+                modal.querySelector('#promptForm').onsubmit = (e) => {
+                    e.preventDefault();
+                    const value = new FormData(e.target).get('value');
+                    if (value) {
+                        onSubmit(value);
+                        modal.remove();
+                    }
+                };
+                modal.onclick = (e) => {
+                    if (e.target === modal) modal.remove();
+                };
+                document.body.appendChild(modal);
+            }
+
+            // Default CMS Content
+            function getDefaultContent() {
+                return {
+                    dashboard: {
+                        title: "لوحة المعلومات",
+                        quick_users: "إدارة المستخدمين",
+                        quick_revenue: "إدارة الإيرادات",
+                        quick_settings: "الإعدادات",
+                        quick_notifications: "الإشعارات",
+                        quick_cms: "إدارة النصوص",
+                        quick_pages: "منشئ الصفحات"
+                    },
+                    stats: {
+                        active_users: "المشتركون النشطون",
+                        from_total: "من إجمالي",
+                        subscriber: "مشترك",
+                        monthly_revenue: "الإيرادات الشهرية",
+                        paid_subscriber: "مشترك مدفوع",
+                        profit: "الربح",
+                        loss: "الخسارة",
+                        net_pnl: "صافي P&L",
+                        profit_minus_loss: "ربح - خسارة",
+                        from_all_subscribers: "من جميع المشتركين"
+                    },
+                    users: {
+                        title: "إدارة المستخدمين",
+                        add_button: "إضافة مستخدم",
+                        search: "ابحث عن مستخدم...",
+                        filter_all: "الكل",
+                        filter_active: "نشط",
+                        filter_inactive: "منتهي",
+                        table_id: "المعرف",
+                        table_user: "المستخدم",
+                        table_status: "الحالة",
+                        table_expiry: "الانتهاء",
+                        table_profit: "ربح",
+                        table_loss: "خسارة",
+                        table_net: "صافي",
+                        table_actions: "الإجراءات",
+                        btn_edit: "تعديل",
+                        btn_unlink: "إلغاء الربط",
+                        status_active: "نشط",
+                        status_inactive: "منتهي"
+                    },
+                    revenue: {
+                        title: "إدارة الإيرادات",
+                        monthly_price: "سعر الاشتراك الشهري",
+                        currency: "دولار أمريكي",
+                        paid_users: "المشتركين المدفوعين",
+                        monthly_revenue: "الإيرادات الشهرية",
+                        free_accounts: "الحسابات المجانية",
+                        add_free: "إضافة حساب مجاني",
+                        remove: "إزالة"
+                    },
+                    notifications: {
+                        title: "إدارة الإشعارات",
+                        add_button: "إضافة إشعار",
+                        active: "مفعّل",
+                        inactive: "معطّل",
+                        enable: "تفعيل",
+                        disable: "تعطيل",
+                        edit: "تعديل",
+                        delete: "حذف"
+                    },
+                    settings: {
+                        title: "الإعدادات المتقدمة",
+                        cms_title: "إدارة المحتوى الديناميكي",
+                        edit_mode: "وضع التحرير",
+                        edit_hint: "عند التفعيل، يمكنك تعديل أي نص في الموقع مباشرة"
+                    }
+                };
+            }
+
+            // Get text from CMS content with edit mode support
+            function t(path, defaultText = '') {
+                const keys = path.split('.');
+                let value = state.cmsContent;
+                
+                for (const key of keys) {
+                    value = value?.[key];
+                    if (value === undefined) {
+                        value = defaultText;
+                        break;
+                    }
+                }
+                
+                const finalValue = value || defaultText;
+                
+                // If edit mode is on, make text editable
+                if (state.editMode && state.isAuth) {
+                    return `<span class="editable-text" data-cms-path="${path}" onclick="app.editText('${path}', this.innerText.trim())">
+                        ${finalValue}
+                        <span class="edit-icon">✏️</span>
+                    </span>`;
+                }
+                
+                return finalValue;
+            }
+
+            // Utility: Get current month key
+            function getCurrentMonthKey() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                return `${year}_${month}`;
+            }
+
+            // Utility: Get next user ID
+            function getNextUserId() {
+                const userIds = Object.keys(state.users)
+                    .filter(key => key.startsWith('user_'))
+                    .map(key => parseInt(key.split('_')[1]))
+                    .filter(num => !isNaN(num));
+                
+                if (userIds.length === 0) return 'user_001';
+                
+                const maxId = Math.max(...userIds);
+                const nextId = maxId + 1;
+                return 'user_' + String(nextId).padStart(3, '0');
+            }
+
+            // Login
+            async function login(username, password) {
+                if (!username || !password) {
+                    showToast('الرجاء إدخال جميع البيانات', 'error');
+                    return false;
+                }
+
+                state.loading = true;
+                render();
+
+                try {
+                    const snap = await db.ref('admins/' + username).once('value');
+                    if (snap.exists() && snap.val().password === password) {
+                        state.isAuth = true;
+                        state.currentAdmin = username;
+                        state.loading = false;
+                        setupListeners();
+                        render();
+                        showToast('تم تسجيل الدخول بنجاح', 'success');
+                        return true;
+                    }
+                    showToast('اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
+                    state.loading = false;
+                    render();
+                    return false;
+                } catch (e) {
+                    showToast('حدث خطأ: ' + e.message, 'error');
+                    state.loading = false;
+                    render();
+                    return false;
+                }
+            }
+
+            // Setup Firebase listeners
+            function setupListeners() {
+                db.ref('admins').on('value', s => {
+                    state.admins = s.val() || {};
+                    render();
+                });
+                
+                db.ref('users').on('value', s => {
+                    state.users = s.val() || {};
+                    render();
+                });
+                
+                db.ref('settings').on('value', s => {
+                    const settings = s.val() || {};
+                    state.settings = settings;
+                    
+                    // Extract revenue settings with safe defaults
+                    state.revenueSettings = {
+                        subscription_price: settings.subscription_price || 10,
+                        excluded_users: Array.isArray(settings.excluded_users) ? settings.excluded_users : []
+                    };
+                    
+                    console.log('Settings loaded:', settings);
+                    console.log('Notifications:', settings.notifications);
+                    console.log('Revenue settings:', state.revenueSettings);
+                    
+                    render();
+                });
+                
+                db.ref('app_version').on('value', s => {
+                    state.appVersion = s.val() || {};
+                    render();
+                });
+                
+                // CMS Listeners
+                db.ref('cms/content').on('value', s => {
+                    state.cmsContent = s.val() || getDefaultContent();
+                    console.log('CMS Content loaded:', state.cmsContent);
+                    render();
+                });
+                
+                db.ref('cms/pages').on('value', s => {
+                    state.customPages = s.val() || {};
+                    console.log('Custom pages loaded:', state.customPages);
+                    render();
+                });
+                
+                db.ref('cms/config/edit_mode').on('value', s => {
+                    state.editMode = s.val() || false;
+                    console.log('Edit mode:', state.editMode);
+                    render();
+                });
+            }
+
+            // Calculate statistics
+            function getStats() {
+                const users = Object.entries(state.users);
+                const now = new Date();
+                const currentMonth = getCurrentMonthKey();
+                const subscriptionPrice = state.revenueSettings.subscription_price || 10;
+                const excludedUsers = state.revenueSettings.excluded_users || [];
+                
+                // Active users (excluding free accounts)
+                const activeUsers = users.filter(([id, u]) => {
+                    const isActive = new Date(u.subscription_end) > now;
+                    const isNotExcluded = !excludedUsers.includes(id);
+                    return isActive && isNotExcluded;
+                });
+                
+                const totalActive = users.filter(([id, u]) => new Date(u.subscription_end) > now).length;
+                const total = users.length;
+                
+                // Calculate revenue (only from non-excluded active users)
+                const thisMonthRevenue = activeUsers.length * subscriptionPrice;
+                
+                // Calculate P&L for current month only
+                let profit = 0, loss = 0;
+                users.forEach(([_, u]) => {
+                    if (u.stats && u.stats[currentMonth]) {
+                        profit += u.stats[currentMonth].total_profit || 0;
+                        loss += Math.abs(u.stats[currentMonth].total_loss || 0);
+                    }
+                });
+                
+                return {
+                    active: totalActive,
+                    total,
+                    inactive: total - totalActive,
+                    revenue: thisMonthRevenue,
+                    paidUsers: activeUsers.length,
+                    freeUsers: totalActive - activeUsers.length,
+                    profit,
+                    loss,
+                    net: profit - loss,
+                    currentMonth
+                };
+            }
+
+            // Filter users
+            function getFilteredUsers() {
+                let users = Object.entries(state.users);
+                
+                if (state.search) {
+                    const search = state.search.toLowerCase();
+                    users = users.filter(([_, u]) => 
+                        u.username?.toLowerCase().includes(search) ||
+                        u.mac_address?.toLowerCase().includes(search)
+                    );
+                }
+                
+                const now = new Date();
+                if (state.filter === 'active') {
+                    users = users.filter(([_, u]) => new Date(u.subscription_end) > now);
+                } else if (state.filter === 'inactive') {
+                    users = users.filter(([_, u]) => new Date(u.subscription_end) <= now);
+                }
+                
+                return users;
+            }
+
+            // Get user stats for current month
+            function getUserStats(user) {
+                const currentMonth = getCurrentMonthKey();
+                if (user.stats && user.stats[currentMonth]) {
+                    const s = user.stats[currentMonth];
+                    return {
+                        profit: s.total_profit || 0,
+                        loss: Math.abs(s.total_loss || 0),
+                        net: (s.total_profit || 0) - Math.abs(s.total_loss || 0),
+                        wins: s.wins_count || 0,
+                        losses: s.losses_count || 0
+                    };
+                }
+                return { profit: 0, loss: 0, net: 0, wins: 0, losses: 0 };
+            }
+
+            // Add user
+            async function showAddUserModal() {
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h2 class="modal-title">➕ إضافة مستخدم جديد</h2>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+                        </div>
+                        <form id="addUserForm">
+                            <div class="form-row cols-2">
+                                <div class="form-group">
+                                    <label class="form-label">اسم المستخدم *</label>
+                                    <input type="text" name="username" class="form-input" required placeholder="أدخل اسم المستخدم">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">كلمة المرور *</label>
+                                    <input type="text" name="password" class="form-input" required placeholder="أدخل كلمة المرور">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">عنوان MAC (اختياري)</label>
+                                <input type="text" name="mac" class="form-input" placeholder="xx:xx:xx:xx:xx:xx">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Telegram Chat ID (اختياري)</label>
+                                <input type="text" name="telegram" class="form-input" placeholder="أدخل Chat ID">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">تاريخ انتهاء الاشتراك *</label>
+                                <input type="date" name="subscription_end" class="form-input" required>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success" style="flex: 1;">
+                                    <span>💾</span>
+                                    <span>حفظ</span>
+                                </button>
+                                <button type="button" class="btn btn-delete" style="flex: 1;" onclick="this.closest('.modal-overlay').remove()">
+                                    <span>✕</span>
+                                    <span>إلغاء</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                modal.querySelector('#addUserForm').onsubmit = async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    const data = {
+                        username: formData.get('username'),
+                        password: formData.get('password'),
+                        mac_address: formData.get('mac') || '',
+                        telegram_chat_id: formData.get('telegram') || null,
+                        subscription_end: formData.get('subscription_end'),
+                        bot_status: 'pending',
+                        bot_link_status: 'pending_start',
+                        last_login_date: new Date().toISOString().split('T')[0],
+                        stats: {}
+                    };
+
+                    const userId = getNextUserId();
+                    
+                    try {
+                        await db.ref('users/' + userId).set(data);
+                        showToast('تم إضافة المستخدم بنجاح', 'success');
+                        modal.remove();
+                    } catch (e) {
+                        showToast('خطأ في الإضافة: ' + e.message, 'error');
+                    }
+                };
+
+                modal.onclick = (e) => {
+                    if (e.target === modal) modal.remove();
+                };
+            }
+
+            // Edit user
+            async function showEditUserModal(userId) {
+                const user = state.users[userId];
+                if (!user) return;
+
+                const userStats = getUserStats(user);
+
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h2 class="modal-title">✏️ تعديل بيانات المستخدم</h2>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+                        </div>
+                        
+                        <!-- User Stats -->
+                        <div style="background: var(--gray-50); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                            <h4 style="font-weight: 800; margin-bottom: 16px; color: var(--gray-900);">📊 إحصائيات الشهر الحالي</h4>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 900; color: var(--success);">$${userStats.profit.toFixed(2)}</div>
+                                    <div style="font-size: 12px; color: var(--gray-500);">ربح</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 900; color: var(--danger);">$${userStats.loss.toFixed(2)}</div>
+                                    <div style="font-size: 12px; color: var(--gray-500);">خسارة</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 900; color: ${userStats.net >= 0 ? 'var(--success)' : 'var(--danger)'};">$${userStats.net.toFixed(2)}</div>
+                                    <div style="font-size: 12px; color: var(--gray-500);">صافي</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form id="editUserForm">
+                            <div class="form-row cols-2">
+                                <div class="form-group">
+                                    <label class="form-label">اسم المستخدم</label>
+                                    <input type="text" name="username" class="form-input" value="${user.username || ''}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">كلمة المرور</label>
+                                    <input type="text" name="password" class="form-input" value="${user.password || ''}" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">عنوان MAC</label>
+                                <input type="text" name="mac" class="form-input" value="${user.mac_address || ''}" placeholder="xx:xx:xx:xx:xx:xx">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Telegram Chat ID</label>
+                                <input type="text" name="telegram" class="form-input" value="${user.telegram_chat_id || ''}" placeholder="أدخل Chat ID">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">تاريخ انتهاء الاشتراك</label>
+                                <input type="date" name="subscription_end" class="form-input" value="${user.subscription_end || ''}" required>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success" style="flex: 1;">
+                                    <span>💾</span>
+                                    <span>حفظ</span>
+                                </button>
+                                <button type="button" class="btn btn-delete" style="flex: 1;" onclick="app.deleteUser('${userId}')">
+                                    <span>🗑️</span>
+                                    <span>حذف</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                modal.querySelector('#editUserForm').onsubmit = async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    const updates = {
+                        username: formData.get('username'),
+                        password: formData.get('password'),
+                        mac_address: formData.get('mac') || '',
+                        telegram_chat_id: formData.get('telegram') || null,
+                        subscription_end: formData.get('subscription_end')
+                    };
+
+                    try {
+                        await db.ref('users/' + userId).update(updates);
+                        showToast('تم تحديث البيانات بنجاح', 'success');
+                        modal.remove();
+                    } catch (e) {
+                        showToast('خطأ في التحديث: ' + e.message, 'error');
+                    }
+                };
+
+                modal.onclick = (e) => {
+                    if (e.target === modal) modal.remove();
+                };
+            }
+
+            // Delete user
+            async function deleteUser(userId) {
+                showConfirm(
+                    'تأكيد الحذف',
+                    'هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء!',
+                    async () => {
+                        try {
+                            await db.ref('users/' + userId).remove();
+                            showToast('تم حذف المستخدم بنجاح', 'success');
+                            document.querySelector('.modal-overlay')?.remove();
+                        } catch (e) {
+                            showToast('خطأ في الحذف: ' + e.message, 'error');
+                        }
+                    }
+                );
+            }
+
+            // Unlink device
+            async function unlinkDevice(userId) {
+                showConfirm(
+                    'إلغاء ارتباط الجهاز',
+                    'هل تريد إلغاء ارتباط الجهاز لهذا المستخدم؟',
+                    async () => {
+                        try {
+                            await db.ref('users/' + userId).update({
+                                mac_address: '',
+                                bot_status: 'pending',
+                                bot_link_status: 'pending_start'
+                            });
+                            showToast('تم إلغاء ارتباط الجهاز بنجاح', 'success');
+                        } catch (e) {
+                            showToast('خطأ: ' + e.message, 'error');
+                        }
+                    }
+                );
+            }
+
+            // Render
+            function render() {
+                const root = document.getElementById('root');
+
+                if (!state.isAuth) {
+                    root.innerHTML = `
+                        <div class="login-container">
+                            <div class="login-box">
+                                <div class="login-logo">🛡️</div>
+                                <h1 class="login-title">لوحة التحكم</h1>
+                                <p class="login-subtitle">مرحباً بك في نظام SIGMATOR</p>
+                                <form id="loginForm">
+                                    <div class="form-group">
+                                        <label class="form-label">اسم المستخدم</label>
+                                        <input type="text" name="username" class="form-input" placeholder="أدخل اسم المستخدم" required autocomplete="username">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">كلمة المرور</label>
+                                        <input type="password" name="password" class="form-input" placeholder="أدخل كلمة المرور" required autocomplete="current-password">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" ${state.loading ? 'disabled' : ''}>
+                                        <span>${state.loading ? '⏳' : '🔐'}</span>
+                                        <span>${state.loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    `;
+
+                    document.getElementById('loginForm').onsubmit = (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(e.target);
+                        login(formData.get('username'), formData.get('password'));
+                    };
+                } else {
+                    const stats = getStats();
+                    const users = getFilteredUsers();
+
+                    root.innerHTML = `
+                        <div class="dashboard">
+                            <header class="header">
+                                <div class="header-content">
+                                    <div class="header-brand" style="cursor: pointer;" onclick="app.setView('dashboard')">
+                                        <div class="header-logo">🛡️</div>
+                                        <div>
+                                            <div class="header-title">SIGMATOR</div>
+                                            <div class="header-user">مرحباً، ${state.currentAdmin}</div>
+                                        </div>
+                                    </div>
+                                    <div class="header-actions">
+                                        ${state.view !== 'dashboard' ? `
+                                            <button class="btn-header" style="background: var(--primary);" onclick="app.setView('dashboard')">
+                                                ← الصفحة الرئيسية
+                                            </button>
+                                        ` : ''}
+                                        <button class="btn-header" onclick="app.logout()">
+                                            🚪 تسجيل الخروج
+                                        </button>
+                                    </div>
+                                </div>
+                            </header>
+                            <main class="main-content">
+                                ${state.view === 'dashboard' ? renderDashboard(stats) : ''}
+                                ${state.view === 'users' ? renderUsers(stats, users) : ''}
+                                ${state.view === 'settings' ? renderSettings() : ''}
+                                ${state.view === 'notifications' ? renderNotifications() : ''}
+                                ${state.view === 'revenue' ? renderRevenue(stats) : ''}
+                                ${state.view === 'admins' ? renderAdmins() : ''}
+                                ${state.view === 'cms_manager' ? renderCMSManager() : ''}
+                                ${state.view === 'page_builder' ? renderPageBuilder() : ''}
+                                ${state.customPages[state.view] ? renderCustomPage(state.view) : ''}
+                            </main>
+                        </div>
+                    `;
+
+                    if (state.view === 'users') {
+                        const searchInput = document.getElementById('searchInput');
+                        if (searchInput) {
+                            searchInput.oninput = (e) => {
+                                state.search = e.target.value;
+                                render();
+                            };
+                        }
+                    }
+                }
+            }
+
+            function renderDashboard(stats) {
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">📊 لوحة المعلومات</h1>
+                    </div>
+
+                    <!-- Quick Access Cards -->
+                    <div class="quick-cards">
+                        <div class="quick-card primary" onclick="app.setView('users')">
+                            <div class="quick-card-icon">👥</div>
+                            <div class="quick-card-title">${t('dashboard.quick_users', 'إدارة المستخدمين')}</div>
+                        </div>
+                        <div class="quick-card success" onclick="app.setView('revenue')">
+                            <div class="quick-card-icon">💰</div>
+                            <div class="quick-card-title">${t('dashboard.quick_revenue', 'إدارة الإيرادات')}</div>
+                        </div>
+                        <div class="quick-card warning" onclick="app.setView('settings')">
+                            <div class="quick-card-icon">⚙️</div>
+                            <div class="quick-card-title">${t('dashboard.quick_settings', 'الإعدادات')}</div>
+                        </div>
+                        <div class="quick-card secondary" onclick="app.setView('notifications')">
+                            <div class="quick-card-icon">🔔</div>
+                            <div class="quick-card-title">${t('dashboard.quick_notifications', 'الإشعارات')}</div>
+                        </div>
+                        <div class="quick-card" style="border-top-color: #ec4899;" onclick="app.setView('cms_manager')">
+                            <div class="quick-card-icon">📝</div>
+                            <div class="quick-card-title">إدارة النصوص</div>
+                        </div>
+                        <div class="quick-card" style="border-top-color: #8b5cf6;" onclick="app.setView('page_builder')">
+                            <div class="quick-card-icon">🎨</div>
+                            <div class="quick-card-title">منشئ الصفحات</div>
+                        </div>
+                        ${Object.entries(state.customPages).filter(([_, page]) => page.enabled).sort((a, b) => a[1].order - b[1].order).map(([id, page]) => `
+                            <div class="quick-card" style="border-top-color: #06b6d4;" onclick="app.setView('${id}')">
+                                <div class="quick-card-icon">${page.icon}</div>
+                                <div class="quick-card-title">${page.name}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card success">
+                            <div class="stat-label">
+                                <span>👥</span>
+                                <span>المشتركون النشطون</span>
+                            </div>
+                            <div class="stat-value success">${stats.active}</div>
+                            <div class="stat-detail">من إجمالي ${stats.total} مشترك</div>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="stat-label">
+                                <span>💰</span>
+                                <span>الإيرادات الشهرية</span>
+                            </div>
+                            <div class="stat-value warning">$${stats.revenue.toFixed(2)}</div>
+                            <div class="stat-detail">${stats.paidUsers} مشترك مدفوع</div>
+                        </div>
+                        <div class="stat-card ${stats.net >= 0 ? 'success' : 'danger'}">
+                            <div class="stat-label">
+                                <span>📈</span>
+                                <span>الربح (${stats.currentMonth})</span>
+                            </div>
+                            <div class="stat-value success">$${stats.profit.toFixed(2)}</div>
+                            <div class="stat-detail">من جميع المشتركين</div>
+                        </div>
+                        <div class="stat-card ${stats.net >= 0 ? 'success' : 'danger'}">
+                            <div class="stat-label">
+                                <span>📉</span>
+                                <span>الخسارة (${stats.currentMonth})</span>
+                            </div>
+                            <div class="stat-value danger">$${stats.loss.toFixed(2)}</div>
+                            <div class="stat-detail">من جميع المشتركين</div>
+                        </div>
+                        <div class="stat-card primary">
+                            <div class="stat-label">
+                                <span>💹</span>
+                                <span>صافي P&L (${stats.currentMonth})</span>
+                            </div>
+                            <div class="stat-value ${stats.net >= 0 ? 'success' : 'danger'}">$${stats.net.toFixed(2)}</div>
+                            <div class="stat-detail">ربح - خسارة</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function renderUsers(stats, users) {
+                const currentMonth = getCurrentMonthKey();
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">👥 إدارة المستخدمين</h1>
+                        <button class="btn btn-success" onclick="app.addUser()">
+                            <span>➕</span>
+                            <span>إضافة مستخدم</span>
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="search-box" style="margin-bottom: 20px;">
+                            <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن مستخدم..." value="${state.search}">
+                        </div>
+                        <div class="filters">
+                            <button class="filter-btn ${state.filter === 'all' ? 'active' : ''}" onclick="app.setFilter('all')">
+                                الكل (${stats.total})
+                            </button>
+                            <button class="filter-btn ${state.filter === 'active' ? 'active' : ''}" onclick="app.setFilter('active')">
+                                نشط (${stats.active})
+                            </button>
+                            <button class="filter-btn ${state.filter === 'inactive' ? 'active' : ''}" onclick="app.setFilter('inactive')">
+                                منتهي (${stats.inactive})
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>المعرف</th>
+                                    <th>المستخدم</th>
+                                    <th>الحالة</th>
+                                    <th>الانتهاء</th>
+                                    <th>ربح (${currentMonth})</th>
+                                    <th>خسارة (${currentMonth})</th>
+                                    <th>صافي</th>
+                                    <th style="text-align: center;">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${users.length > 0 ? users.map(([id, u]) => {
+                                    const isActive = new Date(u.subscription_end) > new Date();
+                                    const userStats = getUserStats(u);
+                                    return `
+                                        <tr>
+                                            <td style="font-family: monospace; font-weight: 700; color: var(--gray-500); font-size: 13px;">${id}</td>
+                                            <td style="font-weight: 700; color: var(--gray-900);">${u.username || 'غير محدد'}</td>
+                                            <td>
+                                                <span class="badge ${isActive ? 'success' : 'danger'}">
+                                                    ${isActive ? '✓ نشط' : '✗ منتهي'}
+                                                </span>
+                                            </td>
+                                            <td style="color: var(--gray-600); font-family: monospace; font-size: 14px;">${u.subscription_end || '-'}</td>
+                                            <td style="font-weight: 700; color: var(--success); font-family: monospace;">$${userStats.profit.toFixed(2)}</td>
+                                            <td style="font-weight: 700; color: var(--danger); font-family: monospace;">$${userStats.loss.toFixed(2)}</td>
+                                            <td style="font-weight: 800; color: ${userStats.net >= 0 ? 'var(--success)' : 'var(--danger)'}; font-family: monospace;">$${userStats.net.toFixed(2)}</td>
+                                            <td style="text-align: center;">
+                                                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                                                    <button class="btn-sm btn-edit" onclick='app.editUser("${id}")'>
+                                                        ✏️ تعديل
+                                                    </button>
+                                                    <button class="btn-sm btn-warning" onclick='app.unlinkDevice("${id}")'>
+                                                        🔓 إلغاء الربط
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('') : `
+                                    <tr>
+                                        <td colspan="8">
+                                            <div class="empty-state">
+                                                <div class="empty-icon">👥</div>
+                                                <div class="empty-title">لا توجد نتائج</div>
+                                                <div class="empty-text">جرّب البحث بكلمات مختلفة أو غيّر الفلتر</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderSettings() {
+                const s = state.settings;
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">⚙️ الإعدادات المتقدمة</h1>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--gray-900);">
+                            🎨 تخصيص الواجهة
+                        </h3>
+                        <p style="color: var(--gray-600); margin-bottom: 20px; line-height: 1.8;">
+                            يمكنك تخصيص جميع عناصر لوحة التحكم من هنا. هذه الصفحة قابلة للتوسع لإضافة المزيد من الخيارات.
+                        </p>
+                        <div style="background: var(--gray-50); border-radius: 12px; padding: 20px;">
+                            <p style="font-size: 14px; color: var(--gray-600);">
+                                💡 <strong>ملاحظة:</strong> هذه الصفحة مخصصة للإعدادات المتقدمة ويمكن توسيعها حسب الحاجة.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- App Version Settings -->
+                    <div class="card">
+                        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--gray-900); display: flex; align-items: center; gap: 12px;">
+                            <span>📱</span>
+                            <span>إعدادات التطبيق</span>
+                        </h3>
+                        <div class="form-row cols-2">
+                            <div class="form-group">
+                                <label class="form-label">الإصدار الحالي</label>
+                                <input type="text" id="app-version" class="form-input" value="${state.appVersion.latest || ''}" placeholder="1.0.0">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">رابط التحديث</label>
+                                <input type="text" id="update-url" class="form-input" value="${state.appVersion.update_url || ''}" placeholder="https://...">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">رسالة الحظر</label>
+                            <input type="text" id="block-message" class="form-input" value="${state.appVersion.block_message || ''}" placeholder="رسالة تظهر للمستخدمين">
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                <input type="checkbox" id="force-block" ${state.appVersion.force_block_old_versions ? 'checked' : ''} style="width: 20px; height: 20px; cursor: pointer;">
+                                <span class="form-label" style="margin: 0;">حظر الإصدارات القديمة</span>
+                            </label>
+                        </div>
+                        <button class="btn btn-primary" onclick="app.updateAppVersion()">
+                            💾 حفظ إعدادات التطبيق
+                        </button>
+                    </div>
+
+                    <!-- API Keys -->
+                    <div class="card">
+                        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--gray-900); display: flex; align-items: center; gap: 12px;">
+                            <span>🔑</span>
+                            <span>مفاتيح API</span>
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">Stripe Price ID</label>
+                            <div style="display: flex; gap: 12px;">
+                                <input type="text" id="stripe-price-id" class="form-input" value="${s.Stripe?.PRICE_ID || ''}" placeholder="price_xxxxx" style="flex: 1;">
+                                <button class="btn-sm btn-edit" onclick="app.updateSetting('settings/Stripe/PRICE_ID', document.getElementById('stripe-price-id').value)">
+                                    💾 حفظ
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ChatGPT API Key</label>
+                            <div style="display: flex; gap: 12px;">
+                                <input type="password" id="chatgpt-key" class="form-input" value="${s.chatGPT?.key || ''}" placeholder="sk-proj-..." style="flex: 1;">
+                                <button class="btn-sm btn-edit" onclick="app.updateSetting('settings/chatGPT/key', document.getElementById('chatgpt-key').value)">
+                                    💾 حفظ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Links -->
+                    <div class="card">
+                        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--gray-900); display: flex; align-items: center; gap: 12px;">
+                            <span>🔗</span>
+                            <span>الروابط</span>
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">رابط التحميل</label>
+                            <div style="display: flex; gap: 12px;">
+                                <input type="text" id="download-link" class="form-input" value="${s.download_sigmator || ''}" placeholder="https://..." style="flex: 1;">
+                                <button class="btn-sm btn-edit" onclick="app.updateSetting('settings/download_sigmator', document.getElementById('download-link').value)">
+                                    💾 حفظ
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">المجموعة العامة</label>
+                            <div style="display: flex; gap: 12px;">
+                                <input type="text" id="public-group" class="form-input" value="${s.public_group || ''}" placeholder="https://t.me/..." style="flex: 1;">
+                                <button class="btn-sm btn-edit" onclick="app.updateSetting('settings/public_group', document.getElementById('public-group').value)">
+                                    💾 حفظ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function renderNotifications() {
+                // Safely read notifications with multiple fallbacks
+                const notifications = state.settings?.notifications || {};
+                const notifEntries = Object.entries(notifications);
+                
+                console.log('Rendering notifications...');
+                console.log('State.settings:', state.settings);
+                console.log('Notifications object:', notifications);
+                console.log('Notification entries:', notifEntries);
+                
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">🔔 إدارة الإشعارات ${notifEntries.length > 0 ? `(${notifEntries.length})` : ''}</h1>
+                        <button class="btn btn-success" onclick="app.addNotification()">
+                            <span>➕</span>
+                            <span>إضافة إشعار</span>
+                        </button>
+                    </div>
+                    
+                    ${notifEntries.length > 0 ? `
+                        <div style="display: grid; gap: 16px;">
+                            ${notifEntries.map(([key, notif]) => {
+                                // Ensure notif is an object
+                                if (!notif || typeof notif !== 'object') {
+                                    console.warn('Invalid notification:', key, notif);
+                                    return '';
+                                }
+                                
+                                const isActive = notif.is_active === true;
+                                const message = notif.message || '';
+                                
+                                return `
+                                    <div class="card" style="border-right: 4px solid ${isActive ? 'var(--success)' : 'var(--gray-300)'};">
+                                        <div style="display: flex; justify-content: space-between; align-items: start; gap: 16px; flex-wrap: wrap;">
+                                            <div style="flex: 1; min-width: 200px;">
+                                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                                    <span class="badge ${isActive ? 'success' : 'danger'}">
+                                                        ${isActive ? '✓ مفعّل' : '✗ معطّل'}
+                                                    </span>
+                                                    <span style="font-family: monospace; font-size: 13px; color: var(--gray-500); font-weight: 700;">${key}</span>
+                                                </div>
+                                                <p style="font-size: 16px; font-weight: 600; color: var(--gray-900); line-height: 1.6;">
+                                                    ${message}
+                                                </p>
+                                            </div>
+                                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                                <button class="btn-sm ${isActive ? 'btn-delete' : 'btn-success'}" onclick="app.toggleNotification('${key}', ${!isActive})">
+                                                    ${isActive ? '⏸️ تعطيل' : '▶️ تفعيل'}
+                                                </button>
+                                                <button class="btn-sm btn-edit" onclick="app.editNotification('${key}', \`${message.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                                                    ✏️ تعديل
+                                                </button>
+                                                <button class="btn-sm btn-delete" onclick="app.deleteNotification('${key}')">
+                                                    🗑️ حذف
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).filter(html => html !== '').join('')}
+                        </div>
+                    ` : `
+                        <div class="card">
+                            <div class="empty-state">
+                                <div class="empty-icon">🔔</div>
+                                <div class="empty-title">لا توجد إشعارات</div>
+                                <div class="empty-text">اضغط على "إضافة إشعار" لإنشاء إشعار جديد</div>
+                            </div>
+                        </div>
+                    `}
+                `;
+            }
+
+            function renderRevenue(stats) {
+                const price = state.revenueSettings.subscription_price || 10;
+                const excluded = state.revenueSettings.excluded_users || [];
+                
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">💰 إدارة الإيرادات</h1>
+                    </div>
+                    
+                    <!-- Revenue Stats -->
+                    <div class="stats-grid" style="margin-bottom: 32px;">
+                        <div class="stat-card warning">
+                            <div class="stat-label">
+                                <span>💵</span>
+                                <span>سعر الاشتراك الشهري</span>
+                            </div>
+                            <div class="stat-value warning">$${price.toFixed(2)}</div>
+                            <div class="stat-detail">دولار أمريكي</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-label">
+                                <span>👥</span>
+                                <span>المشتركين المدفوعين</span>
+                            </div>
+                            <div class="stat-value success">${stats.paidUsers}</div>
+                            <div class="stat-detail">من ${stats.active} نشط</div>
+                        </div>
+                        <div class="stat-card primary">
+                            <div class="stat-label">
+                                <span>💰</span>
+                                <span>الإيرادات الشهرية</span>
+                            </div>
+                            <div class="stat-value primary">$${stats.revenue.toFixed(2)}</div>
+                            <div class="stat-detail">${stats.paidUsers} × $${price}</div>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Price -->
+                    <div class="card">
+                        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--gray-900); display: flex; align-items: center; gap: 12px;">
+                            <span>💵</span>
+                            <span>إعدادات السعر</span>
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">سعر الاشتراك الشهري (بالدولار)</label>
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <input type="number" id="subscription-price" class="form-input" value="${price}" min="0" step="0.01" style="max-width: 200px;">
+                                <button class="btn btn-primary" onclick="app.updateSubscriptionPrice()">
+                                    💾 حفظ السعر
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Excluded Users -->
+                    <div class="card">
+                        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--gray-900); display: flex; align-items: center; gap: 12px;">
+                            <span>🎁</span>
+                            <span>الحسابات المجانية (${stats.freeUsers})</span>
+                        </h3>
+                        <p style="color: var(--gray-600); margin-bottom: 20px; line-height: 1.8;">
+                            المستخدمون المدرجون في هذه القائمة لن يتم احتسابهم في الإيرادات الشهرية
+                        </p>
+                        
+                        ${excluded.length > 0 ? `
+                            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                                ${excluded.map(userId => {
+                                    const user = state.users[userId];
+                                    return `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--gray-50); border-radius: 12px;">
+                                            <div>
+                                                <div style="font-weight: 700; color: var(--gray-900); margin-bottom: 4px;">
+                                                    ${user?.username || 'Unknown'}
+                                                </div>
+                                                <div style="font-family: monospace; font-size: 13px; color: var(--gray-500);">
+                                                    ${userId}
+                                                </div>
+                                            </div>
+                                            <button class="btn-sm btn-delete" onclick="app.removeExcludedUser('${userId}')">
+                                                ✕ إزالة
+                                            </button>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : `
+                            <div style="padding: 40px; text-align: center; background: var(--gray-50); border-radius: 12px; margin-bottom: 20px;">
+                                <div style="font-size: 48px; margin-bottom: 12px; opacity: 0.3;">🎁</div>
+                                <p style="color: var(--gray-500); font-size: 14px;">لا توجد حسابات مجانية حالياً</p>
+                            </div>
+                        `}
+                        
+                        <button class="btn btn-success" onclick="app.addExcludedUser()">
+                            <span>➕</span>
+                            <span>إضافة حساب مجاني</span>
+                        </button>
+                    </div>
+                `;
+            }
+
+            function renderCMSManager() {
+                const contentEntries = Object.entries(state.cmsContent);
+                
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">📝 إدارة النصوص الديناميكية</h1>
+                        <button class="btn ${state.editMode ? 'btn-delete' : 'btn-success'}" onclick="app.toggleEditMode()">
+                            ${state.editMode ? '⏸️ إيقاف وضع التحرير' : '▶️ تفعيل وضع التحرير'}
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">
+                            🎯 وضع التحرير
+                        </h3>
+                        <p style="color: var(--gray-600); line-height: 1.8; margin-bottom: 20px;">
+                            ${state.editMode 
+                                ? '✅ <strong>وضع التحرير مفعّل!</strong> الآن يمكنك الضغط على أي نص في الموقع لتعديله مباشرة.' 
+                                : '⚠️ وضع التحرير معطّل. فعّله أعلاه لتتمكن من تعديل النصوص مباشرة من الواجهة.'}
+                        </p>
+                        <div style="background: var(--gray-50); border-radius: 12px; padding: 20px;">
+                            <p style="font-size: 14px; color: var(--gray-600); line-height: 1.8;">
+                                💡 <strong>كيف يعمل:</strong><br>
+                                1. فعّل "وضع التحرير" أعلاه<br>
+                                2. اذهب لأي صفحة في الموقع<br>
+                                3. مرر الماوس على أي نص - ستظهر أيقونة قلم ✏️<br>
+                                4. اضغط على النص لفتح نافذة التعديل<br>
+                                5. احفظ التغييرات - سيتم تحديثها فوراً للجميع!
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="font-size: 20px; font-weight: 800; margin: 0;">
+                                📋 محتوى CMS الحالي
+                            </h3>
+                            <button class="btn btn-primary" onclick="app.addCMSSection()">
+                                ➕ إضافة قسم جديد
+                            </button>
+                        </div>
+                        
+                        ${contentEntries.length > 0 ? `
+                            <div style="display: grid; gap: 16px;">
+                                ${contentEntries.map(([section, content]) => `
+                                    <div class="card" style="background: var(--gray-50); border: 2px solid var(--gray-200);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                            <h4 style="font-size: 18px; font-weight: 800; color: var(--primary);">
+                                                📁 ${section}
+                                            </h4>
+                                            <div style="display: flex; gap: 8px;">
+                                                <button class="btn-sm btn-edit" onclick="app.editCMSSection('${section}')">
+                                                    ✏️ تعديل
+                                                </button>
+                                                <button class="btn-sm btn-delete" onclick="app.deleteCMSSection('${section}')">
+                                                    🗑️ حذف
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div style="display: grid; gap: 8px; font-size: 14px;">
+                                            ${Object.entries(content || {}).map(([key, value]) => `
+                                                <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: white; border-radius: 8px;">
+                                                    <span style="color: var(--gray-500); font-weight: 700;">${key}:</span>
+                                                    <span style="color: var(--gray-900);">${value}</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <div class="empty-state">
+                                <div class="empty-icon">📝</div>
+                                <div class="empty-title">لا يوجد محتوى CMS</div>
+                                <div class="empty-text">ابدأ بإضافة أول قسم من المحتوى الديناميكي</div>
+                            </div>
+                        `}
+                    </div>
+                `;
+            }
+
+            function renderPageBuilder() {
+                const pages = Object.entries(state.customPages);
+                
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">🎨 منشئ الصفحات الديناميكية</h1>
+                        <button class="btn btn-success" onclick="app.createPage()">
+                            ➕ إنشاء صفحة جديدة
+                        </button>
+                    </div>
+                    
+                    <div class="card" style="margin-bottom: 24px;">
+                        <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 16px;">
+                            💡 كيف يعمل منشئ الصفحات؟
+                        </h3>
+                        <div style="background: var(--gray-50); border-radius: 12px; padding: 20px;">
+                            <ol style="color: var(--gray-700); line-height: 2; padding-right: 20px;">
+                                <li><strong>أنشئ صفحة جديدة</strong> - حدد اسم وأيقونة للصفحة</li>
+                                <li><strong>أضف عناصر تحكم (Widgets)</strong> - حقول نص، أرقام، تواريخ، إلخ</li>
+                                <li><strong>اربط مع Firebase</strong> - حدد مسار قاعدة البيانات لكل عنصر</li>
+                                <li><strong>تظهر تلقائياً</strong> - الصفحة تظهر في القائمة الرئيسية!</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    ${pages.length > 0 ? `
+                        <div style="display: grid; gap: 20px;">
+                            ${pages.map(([id, page]) => `
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; gap: 16px; flex-wrap: wrap;">
+                                        <div style="display: flex; align-items: start; gap: 16px; flex: 1;">
+                                            <div style="font-size: 48px; line-height: 1;">${page.icon}</div>
+                                            <div style="flex: 1;">
+                                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                                                    <h3 style="font-size: 24px; font-weight: 900; margin: 0;">${page.name}</h3>
+                                                    <span class="badge ${page.enabled ? 'success' : 'danger'}">
+                                                        ${page.enabled ? '✓ مفعّل' : '✗ معطّل'}
+                                                    </span>
+                                                </div>
+                                                <p style="color: var(--gray-600); font-size: 14px; margin-bottom: 12px;">
+                                                    <strong>${(page.widgets || []).length}</strong> عنصر تحكم | 
+                                                    الترتيب: <strong>${page.order}</strong>
+                                                </p>
+                                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                                    <button class="btn-sm btn-primary" onclick="app.setView('${id}')">
+                                                        👁️ عرض الصفحة
+                                                    </button>
+                                                    <button class="btn-sm btn-success" onclick="app.addWidget('${id}')">
+                                                        ➕ إضافة عنصر
+                                                    </button>
+                                                    <button class="btn-sm btn-edit" onclick="app.editPage('${id}')">
+                                                        ✏️ تعديل
+                                                    </button>
+                                                    <button class="btn-sm ${page.enabled ? 'btn-warning' : 'btn-success'}" 
+                                                            onclick="app.togglePage('${id}', ${!page.enabled})">
+                                                        ${page.enabled ? '⏸️ تعطيل' : '▶️ تفعيل'}
+                                                    </button>
+                                                    <button class="btn-sm btn-delete" onclick="app.deletePage('${id}')">
+                                                        🗑️ حذف
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : `
+                        <div class="card">
+                            <div class="empty-state">
+                                <div class="empty-icon">🎨</div>
+                                <div class="empty-title">لا توجد صفحات مخصصة</div>
+                                <div class="empty-text">اضغط على "إنشاء صفحة جديدة" لبدء بناء صفحتك الأولى!</div>
+                            </div>
+                        </div>
+                    `}
+                `;
+            }
+
+            function renderCustomPage(pageId) {
+                const page = state.customPages[pageId];
+                if (!page) return '<div class="card"><p>الصفحة غير موجودة</p></div>';
+                
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">${page.icon} ${page.name}</h1>
+                        <button class="btn btn-success" onclick="app.addWidget('${pageId}')">
+                            ➕ إضافة عنصر تحكم
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        ${(page.widgets || []).length > 0 ? `
+                            <div style="display: grid; gap: 24px;">
+                                ${page.widgets.map(widget => renderWidget(widget, pageId)).join('')}
+                            </div>
+                        ` : `
+                            <div class="empty-state">
+                                <div class="empty-icon">📋</div>
+                                <div class="empty-title">لا توجد عناصر تحكم</div>
+                                <div class="empty-text">اضغط على "إضافة عنصر تحكم" لبدء بناء الصفحة</div>
+                            </div>
+                        `}
+                    </div>
+                `;
+            }
+
+            function renderWidget(widget, pageId) {
+                // This will be populated with real-time data from Firebase
+                const widgetId = `widget_${widget.id || widget.firebase_path.replace(/\//g, '_')}`;
+                
+                return `
+                    <div class="card" style="background: var(--gray-50); border: 2px solid var(--gray-200);">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                            <h4 style="font-size: 16px; font-weight: 800; color: var(--gray-900);">
+                                ${widget.label}
+                            </h4>
+                            <button class="btn-sm btn-delete" onclick="app.deleteWidget('${pageId}', '${widget.id}')">
+                                🗑️ حذف
+                            </button>
+                        </div>
+                        <p style="font-size: 12px; color: var(--gray-500); margin-bottom: 12px; font-family: monospace;">
+                            📍 Firebase: ${widget.firebase_path}
+                        </p>
+                        ${renderWidgetInput(widget, widgetId)}
+                    </div>
+                `;
+            }
+
+            function renderWidgetInput(widget, widgetId) {
+                switch (widget.type) {
+                    case 'text':
+                        return `
+                            <div class="form-group" style="margin: 0;">
+                                <div style="display: flex; gap: 12px;">
+                                    <input type="text" 
+                                           class="form-input" 
+                                           id="${widgetId}"
+                                           placeholder="${widget.placeholder || ''}"
+                                           style="flex: 1;">
+                                    <button class="btn-sm btn-edit" onclick="app.saveWidgetValue('${widgetId}', '${widget.firebase_path}', 'text')">
+                                        💾 حفظ
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    
+                    case 'number':
+                        return `
+                            <div class="form-group" style="margin: 0;">
+                                <div style="display: flex; gap: 12px;">
+                                    <input type="number" 
+                                           class="form-input" 
+                                           id="${widgetId}"
+                                           min="${widget.min || ''}"
+                                           max="${widget.max || ''}"
+                                           step="${widget.step || 'any'}"
+                                           style="flex: 1;">
+                                    <button class="btn-sm btn-edit" onclick="app.saveWidgetValue('${widgetId}', '${widget.firebase_path}', 'number')">
+                                        💾 حفظ
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    
+                    case 'toggle':
+                        return `
+                            <div class="form-group" style="margin: 0;">
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" 
+                                           id="${widgetId}"
+                                           onchange="app.saveWidgetValue('${widgetId}', '${widget.firebase_path}', 'toggle')"
+                                           style="width: 24px; height: 24px; cursor: pointer;">
+                                    <span style="font-size: 14px; color: var(--gray-700);">تفعيل/تعطيل</span>
+                                </label>
+                            </div>
+                        `;
+                    
+                    case 'date':
+                        return `
+                            <div class="form-group" style="margin: 0;">
+                                <div style="display: flex; gap: 12px;">
+                                    <input type="date" 
+                                           class="form-input" 
+                                           id="${widgetId}"
+                                           style="flex: 1;">
+                                    <button class="btn-sm btn-edit" onclick="app.saveWidgetValue('${widgetId}', '${widget.firebase_path}', 'date')">
+                                        💾 حفظ
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    
+                    default:
+                        return '<p style="color: var(--gray-500);">نوع غير معروف</p>';
+                }
+            }
+
+            function renderAdmins() {
+                const admins = Object.entries(state.admins);
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">🛡️ إدارة المشرفين</h1>
+                        <button class="btn btn-success" onclick="app.addAdmin()">
+                            <span>➕</span>
+                            <span>إضافة مشرف</span>
+                        </button>
+                    </div>
+                    
+                    <div style="display: grid; gap: 16px;">
+                        ${admins.map(([username, admin]) => `
+                            <div class="card">
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
+                                    <div style="flex: 1; min-width: 200px;">
+                                        <div style="font-size: 20px; font-weight: 800; color: var(--gray-900); margin-bottom: 8px; display: flex; align-items: center; gap: 12px;">
+                                            <span>👤</span>
+                                            <span>${username}</span>
+                                            ${username === state.currentAdmin ? '<span class="badge success">أنت</span>' : ''}
+                                        </div>
+                                        <div style="font-size: 14px; color: var(--gray-500);">
+                                            كلمة المرور: <span style="font-family: monospace; background: var(--gray-100); padding: 4px 12px; border-radius: 6px; font-weight: 700;">••••••••</span>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                        <button class="btn-sm btn-edit" onclick="app.changeAdminPassword('${username}')">
+                                            🔑 تغيير كلمة المرور
+                                        </button>
+                                        ${username !== state.currentAdmin ? `
+                                            <button class="btn-sm btn-delete" onclick="app.deleteAdmin('${username}')">
+                                                🗑️ حذف
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // Global app object
+            window.app = {
+                setView: (view) => {
+                    state.view = view;
+                    render();
+                },
+                setFilter: (filter) => {
+                    state.filter = filter;
+                    render();
+                },
+                logout: () => {
+                    showConfirm(
+                        'تسجيل الخروج',
+                        'هل أنت متأكد من تسجيل الخروج؟',
+                        () => {
+                            state.isAuth = false;
+                            state.currentAdmin = '';
+                            render();
+                            showToast('تم تسجيل الخروج بنجاح', 'success');
+                        }
+                    );
+                },
+                addUser: showAddUserModal,
+                editUser: showEditUserModal,
+                deleteUser: deleteUser,
+                unlinkDevice: unlinkDevice,
+                
+                // Settings
+                updateSetting: async (path, value) => {
+                    if (!value) {
+                        showToast('الرجاء إدخال قيمة', 'error');
+                        return;
+                    }
+                    try {
+                        await db.ref(path).set(value);
+                        showToast('تم التحديث بنجاح', 'success');
+                    } catch (e) {
+                        showToast('خطأ: ' + e.message, 'error');
+                    }
+                },
+                
+                updateAppVersion: async () => {
+                    const version = document.getElementById('app-version').value;
+                    const updateUrl = document.getElementById('update-url').value;
+                    const blockMessage = document.getElementById('block-message').value;
+                    const forceBlock = document.getElementById('force-block').checked;
+                    
+                    try {
+                        await db.ref('app_version').set({
+                            latest: version,
+                            update_url: updateUrl,
+                            block_message: blockMessage,
+                            force_block_old_versions: forceBlock
+                        });
+                        showToast('تم تحديث إعدادات الإصدار بنجاح', 'success');
+                    } catch (e) {
+                        showToast('خطأ: ' + e.message, 'error');
+                    }
+                },
+                
+                // Notifications
+                addNotification: () => {
+                    showPrompt('إضافة إشعار جديد', 'معرّف الإشعار (مثال: m3)', '', (key) => {
+                        showPrompt('إضافة إشعار جديد', 'نص الإشعار', '', async (message) => {
+                            showConfirm(
+                                'تفعيل الإشعار',
+                                'هل تريد تفعيل الإشعار الآن؟',
+                                async () => {
+                                    try {
+                                        await db.ref(`settings/notifications/${key}`).set({
+                                            message: message,
+                                            is_active: true
+                                        });
+                                        showToast('تم إضافة وتفعيل الإشعار', 'success');
+                                    } catch (e) {
+                                        showToast('خطأ: ' + e.message, 'error');
+                                    }
+                                }
+                            );
+                        });
+                    });
+                },
+                
+                editNotification: (key, oldMessage) => {
+                    showPrompt('تعديل الإشعار', 'نص الإشعار', oldMessage, async (newMessage) => {
+                        try {
+                            await db.ref(`settings/notifications/${key}/message`).set(newMessage);
+                            showToast('تم تحديث الإشعار بنجاح', 'success');
+                        } catch (e) {
+                            showToast('خطأ: ' + e.message, 'error');
+                        }
+                    });
+                },
+                
+                toggleNotification: async (key, newState) => {
+                    try {
+                        await db.ref(`settings/notifications/${key}/is_active`).set(newState);
+                        showToast(newState ? 'تم تفعيل الإشعار' : 'تم تعطيل الإشعار', 'success');
+                    } catch (e) {
+                        showToast('خطأ: ' + e.message, 'error');
+                    }
+                },
+                
+                deleteNotification: (key) => {
+                    showConfirm(
+                        'حذف الإشعار',
+                        'هل أنت متأكد من حذف هذا الإشعار؟',
+                        async () => {
+                            try {
+                                await db.ref(`settings/notifications/${key}`).remove();
+                                showToast('تم حذف الإشعار بنجاح', 'success');
+                            } catch (e) {
+                                showToast('خطأ: ' + e.message, 'error');
+                            }
+                        }
+                    );
+                },
+                
+                // Revenue
+                updateSubscriptionPrice: async () => {
+                    const priceInput = document.getElementById('subscription-price');
+                    if (!priceInput) {
+                        showToast('خطأ: لم يتم العثور على حقل السعر', 'error');
+                        return;
+                    }
+                    
+                    const price = parseFloat(priceInput.value);
+                    if (isNaN(price) || price < 0) {
+                        showToast('الرجاء إدخال سعر صحيح', 'error');
+                        return;
+                    }
+                    
+                    console.log('Updating subscription price to:', price);
+                    
+                    try {
+                        // Update directly in settings node
+                        await db.ref('settings/subscription_price').set(price);
+                        showToast('تم تحديث السعر بنجاح', 'success');
+                        console.log('Price updated successfully');
+                    } catch (e) {
+                        console.error('Error updating price:', e);
+                        showToast('خطأ في التحديث: ' + e.message, 'error');
+                    }
+                },
+                
+                addExcludedUser: () => {
+                    const allUsers = Object.entries(state.users);
+                    const excluded = state.revenueSettings?.excluded_users || [];
+                    const available = allUsers.filter(([id]) => !excluded.includes(id));
+                    
+                    console.log('All users:', allUsers.length);
+                    console.log('Excluded users:', excluded);
+                    console.log('Available users:', available.length);
+                    
+                    if (available.length === 0) {
+                        showToast('جميع المستخدمين مستثنون بالفعل', 'error');
+                        return;
+                    }
+                    
+                    const modal = document.createElement('div');
+                    modal.className = 'modal-overlay';
+                    modal.innerHTML = `
+                        <div class="modal">
+                            <div class="modal-header">
+                                <h2 class="modal-title">إضافة حساب مجاني</h2>
+                                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+                            </div>
+                            <p style="margin-bottom: 20px; color: var(--gray-600);">
+                                اختر المستخدم الذي تريد إضافته كحساب مجاني (${available.length} متاح)
+                            </p>
+                            <div style="max-height: 400px; overflow-y: auto;">
+                                ${available.map(([id, u]) => `
+                                    <div style="padding: 16px; background: var(--gray-50); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent;" 
+                                         onmouseover="this.style.borderColor='var(--primary)'; this.style.background='white';" 
+                                         onmouseout="this.style.borderColor='transparent'; this.style.background='var(--gray-50)';"
+                                         onclick="window.selectUserForExclusion('${id}')">
+                                        <div style="font-weight: 700; color: var(--gray-900); margin-bottom: 4px;">${u.username || 'Unknown'}</div>
+                                        <div style="font-family: monospace; font-size: 13px; color: var(--gray-500);">${id}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Create global function for selection
+                    window.selectUserForExclusion = async (userId) => {
+                        console.log('Adding excluded user:', userId);
+                        try {
+                            const currentExcluded = state.revenueSettings?.excluded_users || [];
+                            const newExcluded = [...currentExcluded, userId];
+                            console.log('New excluded list:', newExcluded);
+                            
+                            await db.ref('settings/excluded_users').set(newExcluded);
+                            showToast('تم إضافة المستخدم للحسابات المجانية', 'success');
+                            modal.remove();
+                            delete window.selectUserForExclusion;
+                        } catch (e) {
+                            console.error('Error adding excluded user:', e);
+                            showToast('خطأ: ' + e.message, 'error');
+                        }
+                    };
+                    
+                    modal.onclick = (e) => {
+                        if (e.target === modal) {
+                            modal.remove();
+                            delete window.selectUserForExclusion;
+                        }
+                    };
+                    
+                    document.body.appendChild(modal);
+                },
+                
+                removeExcludedUser: (userId) => {
+                    showConfirm(
+                        'إزالة من الحسابات المجانية',
+                        'هل تريد إزالة هذا المستخدم من الحسابات المجانية؟ سيتم احتسابه في الإيرادات الشهرية.',
+                        async () => {
+                            console.log('Removing excluded user:', userId);
+                            try {
+                                const currentExcluded = state.revenueSettings?.excluded_users || [];
+                                const newExcluded = currentExcluded.filter(id => id !== userId);
+                                console.log('New excluded list:', newExcluded);
+                                
+                                await db.ref('settings/excluded_users').set(newExcluded);
+                                showToast('تم إزالة المستخدم من الحسابات المجانية', 'success');
+                            } catch (e) {
+                                console.error('Error removing excluded user:', e);
+                                showToast('خطأ: ' + e.message, 'error');
+                            }
+                        }
+                    );
+                },
+                
+                
+                // ===== CMS FUNCTIONS =====
+                
+                // Edit Text inline
+                editText: (path, currentValue) => {
+                    showPrompt('تعديل النص', 'النص الجديد', currentValue, async (newValue) => {
+                        try {
+                            const pathParts = path.split('.');
+                            await db.ref(`cms/content/${pathParts.join('/')}`).set(newValue);
+                            showToast('تم تحديث النص بنجاح ✅', 'success');
+                        } catch (e) {
+                            showToast('خطأ: ' + e.message, 'error');
+                        }
+                    });
+                },
+                
+                // Toggle Edit Mode
+                toggleEditMode: async () => {
+                    try {
+                        const newMode = !state.editMode;
+                        await db.ref('cms/config/edit_mode').set(newMode);
+                        showToast(newMode ? 'تم تفعيل وضع التحرير' : 'تم إيقاف وضع التحرير', 'success');
+                    } catch (e) {
+                        showToast('خطأ: ' + e.message, 'error');
+                    }
+                },
+                
+                // Add CMS Section
+                addCMSSection: () => {
+                    showPrompt('إضافة قسم جديد', 'اسم القسم (مثال: products)', '', (sectionName) => {
+                        showPrompt('إضافة قسم جديد', 'أول مفتاح في القسم', '', async (firstKey) => {
+                            showPrompt('إضافة قسم جديد', 'قيمة المفتاح', '', async (firstValue) => {
+                                try {
+                                    await db.ref(`cms/content/${sectionName}/${firstKey}`).set(firstValue);
+                                    showToast('تم إضافة القسم بنجاح', 'success');
+                                } catch (e) {
+                                    showToast('خطأ: ' + e.message, 'error');
+                                }
+                            });
+                        });
+                    });
+                },
+                
+                // Edit CMS Section
+                editCMSSection: (section) => {
+                    showPrompt('إضافة مفتاح جديد', 'اسم المفتاح', '', (key) => {
+                        showPrompt('إضافة مفتاح جديد', 'القيمة', '', async (value) => {
+                            try {
+                                await db.ref(`cms/content/${section}/${key}`).set(value);
+                                showToast('تم إضافة المفتاح بنجاح', 'success');
+                            } catch (e) {
+                                showToast('خطأ: ' + e.message, 'error');
+                            }
+                        });
+                    });
+                },
+                
+                // Delete CMS Section
+                deleteCMSSection: (section) => {
+                    showConfirm(
+                        'حذف قسم',
+                        `هل أنت متأكد من حذف قسم "${section}" بالكامل؟`,
+                        async () => {
+                            try {
+                                await db.ref(`cms/content/${section}`).remove();
+                                showToast('تم حذف القسم بنجاح', 'success');
+                            } catch (e) {
+                                showToast('خطأ: ' + e.message, 'error');
+                            }
+                        }
+                    );
+                },
+                
+                // Create Page
+                createPage: () => {
+                    const modal = document.createElement('div');
+                    modal.className = 'modal-overlay';
+                    modal.innerHTML = `
+                        <div class="modal">
+                            <div class="modal-header">
+                                <h2 class="modal-title">إنشاء صفحة جديدة</h2>
+                                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+                            </div>
+                            <form id="createPageForm">
+                                <div class="form-group">
+                                    <label class="form-label">اسم الصفحة</label>
+                                    <input type="text" name="name" class="form-input" required placeholder="مثال: إدارة المنتجات">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">الأيقونة (Emoji)</label>
+                                    <input type="text" name="icon" class="form-input" required placeholder="📦" value="📦">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">الترتيب (رقم)</label>
+                                    <input type="number" name="order" class="form-input" value="10" required>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-success" style="flex: 1;">
+                                        💾 إنشاء الصفحة
+                                    </button>
+                                    <button type="button" class="btn" style="flex: 1; background: var(--gray-200); color: var(--gray-700);" onclick="this.closest('.modal-overlay').remove()">
+                                        ✕ إلغاء
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    `;
+                    
+                    modal.querySelector('form').onsubmit = async (e) => {
+                        e.preventDefault();
+                        const data = new FormData(e.target);
+                        const pageId = 'page_' + Date.now();
+                        
+                        try {
+                            await db.ref(`cms/pages/${pageId}`).set({
+                                name: data.get('name'),
+                                icon: data.get('icon'),
+                                order: parseInt(data.get('order')),
+                                enabled: true,
+                                widgets: []
+                            });
+                            showToast('تم إنشاء الصفحة بنجاح', 'success');
+                            modal.remove();
+                        } catch (e) {
+                            showToast('خطأ: ' + e.message, 'error');
+                        }
+                    };
+                    
+                    modal.onclick = (e) => {
+                        if (e.target === modal) modal.remove();
+                    };
+                    
+                    document.body.appendChild(modal);
+                },
+                
+                // Edit Page
+                editPage: (pageId) => {
+                    const page = state.customPages[pageId];
+                    const modal = document.createElement('div');
+                    modal.className = 'modal-overlay';
+                    modal.innerHTML = `
+                        <div class="modal">
+                            <div class="modal-header">
+                                <h2 class="modal-title">تعديل الصفحة</h2>
+                                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+                            </div>
+                            <form id="editPageForm">
+                                <div class="form-group">
+                                    <label class="form-label">اسم الصفحة</label>
+                                    <input type="text" name="name" class="form-input" value="${page.name}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">الأيقونة</label>
+                                    <input type="text" name="icon" class="form-input" value="${page.icon}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">الترتيب</label>
+                                    <input type="number" name="order" class="form-input" value="${page.order}" required>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-success" style="flex: 1;">💾 حفظ</button>
+                                </div>
+                            </form>
+                        </div>
+                    `;
+                    
+                    modal.querySelector('form').onsubmit = async (e) => {
+                        e.preventDefault();
+                        const data = new FormData(e.target);
+                        try {
+                            await db.ref(`cms/pages/${pageId}`).update({
+                                name: data.get('name'),
+                                icon: data.get('icon'),
+                                order: parseInt(data.get('order'))
+                            });
+                            showToast('تم تحديث الصفحة', 'success');
+                            modal.remove();
+                        } catch (e) {
+                            showToast('خطأ: ' + e.message, 'error');
+                        }
+                    };
+                    
+                    document.body.appendChild(modal);
+                },
+                
+                // Toggle Page
+                togglePage: async (pageId, newState) => {
+                    try {
+                        await db.ref(`cms/pages/${pageId}/enabled`).set(newState);
+                        showToast(newState ? 'تم تفعيل الصفحة' : 'تم تعطيل الصفحة', 'success');
+                    } catch (e) {
+                        showToast('خطأ: ' + e.message, 'error');
+                    }
+                },
+                
+                // Delete Page
+                deletePage: (pageId) => {
+                    showConfirm(
+                        'حذف صفحة',
+                        'هل أنت متأكد من حذف هذه الصفحة؟',
+                        async () => {
+                            try {
+                                await db.ref(`cms/pages/${pageId}`).remove();
+                                showToast('تم حذف الصفحة', 'success');
+                                app.setView('page_builder');
+                            } catch (e) {
+                                showToast('خطأ: ' + e.message, 'error');
+                            }
+                        }
+                    );
+                },
+                
+                // Add Widget
+                addWidget: (pageId) => {
+                    const WIDGET_TYPES = {
+                        text: { name: 'حقل نص', icon: '📝' },
+                        number: { name: 'حقل رقم', icon: '🔢' },
+                        toggle: { name: 'زر تبديل', icon: '🔘' },
+                        date: { name: 'حقل تاريخ', icon: '📅' }
+                    };
+                    
+                    const modal = document.createElement('div');
+                    modal.className = 'modal-overlay';
+                    modal.innerHTML = `
+                        <div class="modal">
+                            <div class="modal-header">
+                                <h2 class="modal-title">إضافة عنصر تحكم</h2>
+                                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+                            </div>
+                            
+                            <div style="margin-bottom: 24px;">
+                                <label class="form-label">نوع العنصر</label>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                                    ${Object.entries(WIDGET_TYPES).map(([type, info]) => `
+                                        <div onclick="window.selectedWidgetType='${type}'; document.querySelectorAll('.widget-type-card').forEach(c => c.style.borderColor='transparent'); event.target.closest('.widget-type-card').style.borderColor='var(--primary)'; document.getElementById('widgetForm').style.display='block';"
+                                             class="widget-type-card" 
+                                             style="padding: 20px; background: var(--gray-50); border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s; border: 2px solid transparent;">
+                                            <div style="font-size: 32px; margin-bottom: 8px;">${info.icon}</div>
+                                            <div style="font-size: 14px; font-weight: 700;">${info.name}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            
+                            <form id="widgetForm" style="display: none;">
+                                <div class="form-group">
+                                    <label class="form-label">العنوان (Label)</label>
+                                    <input type="text" name="label" class="form-input" required placeholder="مثال: سعر المنتج">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">مسار Firebase</label>
+                                    <input type="text" name="firebase_path" class="form-input" required placeholder="مثال: products/item_1/price">
+                                    <p style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">
+                                        💡 المسار الذي سيتم القراءة منه والكتابة إليه
+                                    </p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Placeholder (اختياري)</label>
+                                    <input type="text" name="placeholder" class="form-input" placeholder="نص توضيحي">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-success" style="flex: 1;">
+                                        💾 إضافة العنصر
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    `;
+                    
+                    modal.querySelector('form').onsubmit = async (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(e.target);
+                        const widgetData = {
+                            id: 'widget_' + Date.now(),
+                            type: window.selectedWidgetType,
+                            label: formData.get('label'),
+                            firebase_path: formData.get('firebase_path'),
+                            placeholder: formData.get('placeholder') || ''
+                        };
+                        
+                        try {
+                            const page = state.customPages[pageId];
+                            const widgets = page.widgets || [];
+                            widgets.push(widgetData);
+                            
+                            await db.ref(`cms/pages/${pageId}/widgets`).set(widgets);
+                            showToast('تم إضافة العنصر بنجاح', 'success');
+                            modal.remove();
+                        } catch (e) {
+                            showToast('خطأ: ' + e.message, 'error');
+                        }
+                    };
+                    
+                    modal.onclick = (e) => {
+                        if (e.target === modal) modal.remove();
+                    };
+                    
+                    document.body.appendChild(modal);
+                },
+                
+                // Delete Widget
+                deleteWidget: (pageId, widgetId) => {
+                    showConfirm(
+                        'حذف عنصر',
+                        'هل أنت متأكد من حذف هذا العنصر؟',
+                        async () => {
+                            try {
+                                const page = state.customPages[pageId];
+                                const widgets = (page.widgets || []).filter(w => w.id !== widgetId);
+                                await db.ref(`cms/pages/${pageId}/widgets`).set(widgets);
+                                showToast('تم حذف العنصر', 'success');
+                            } catch (e) {
+                                showToast('خطأ: ' + e.message, 'error');
+                            }
+                        }
+                    );
+                },
+                
+                // Save Widget Value
+                saveWidgetValue: async (widgetId, firebasePath, type) => {
+                    const input = document.getElementById(widgetId);
+                    if (!input) {
+                        showToast('خطأ: لم يتم العثور على الحقل', 'error');
+                        return;
+                    }
+                    
+                    let value = input.value;
+                    
+                    if (type === 'toggle') {
+                        value = input.checked;
+                    } else if (type === 'number') {
+                        value = parseFloat(value);
+                        if (isNaN(value)) {
+                            showToast('الرجاء إدخال رقم صحيح', 'error');
+                            return;
+                        }
+                    }
+                    
+                    try {
+                        await db.ref(firebasePath).set(value);
+                        showToast('تم حفظ البيانات بنجاح ✅', 'success');
+                    } catch (e) {
+                        showToast('خطأ في الحفظ: ' + e.message, 'error');
+                    }
+                },
+                
+                // ===== END CMS FUNCTIONS =====
+                
+                // Admins
+                addAdmin: () => {
+                    showPrompt('إضافة مشرف جديد', 'اسم المشرف', '', (username) => {
+                        if (state.admins[username]) {
+                            showToast('هذا المشرف موجود بالفعل', 'error');
+                            return;
+                        }
+                        showPrompt('إضافة مشرف جديد', 'كلمة المرور', '', async (password) => {
+                            try {
+                                await db.ref(`admins/${username}`).set({ password });
+                                showToast('تم إضافة المشرف بنجاح', 'success');
+                            } catch (e) {
+                                showToast('خطأ: ' + e.message, 'error');
+                            }
+                        });
+                    });
+                },
+                
+                changeAdminPassword: (username) => {
+                    showPrompt('تغيير كلمة المرور', `كلمة مرور جديدة لـ "${username}"`, '', async (newPassword) => {
+                        try {
+                            await db.ref(`admins/${username}/password`).set(newPassword);
+                            showToast('تم تغيير كلمة المرور بنجاح', 'success');
+                        } catch (e) {
+                            showToast('خطأ: ' + e.message, 'error');
+                        }
+                    });
+                },
+                
+                deleteAdmin: (username) => {
+                    showConfirm(
+                        'حذف مشرف',
+                        `هل أنت متأكد من حذف المشرف "${username}"؟`,
+                        async () => {
+                            try {
+                                await db.ref(`admins/${username}`).remove();
+                                showToast('تم حذف المشرف بنجاح', 'success');
+                            } catch (e) {
+                                showToast('خطأ: ' + e.message, 'error');
+                            }
+                        }
+                    );
+                }
+            };
+
+            render();
+        }
+    </script>
+</body>
+</html>
